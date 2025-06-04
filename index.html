@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Access and Photo Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 1px solid #ddd;
+        }
+
+        #photo {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        #captureButton {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body style="background-color: #a1c9a1;">
+    <h1>Plant Water Recommendation App</h1>
+
+    <video id="video" autoplay playsinline></video>
+
+    <br>
+
+    <button id="captureButton" style="bottom: 40px; left: 10px; right: 10px; display: fixed;">Take Photo</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="photo" alt="Captured Photo" style="display: block; margin-top: 20px;">
+
+    <button id="analyzeButton" style="bottom: 40; left: 10; right: 10; position: relative;">Analyze Photo</button>
+    <button id="saveButton" style="bottom: 40; left: 10; right: 10; position: relative;">Save Photo</button>
+    <input type="text" id="plantName" placeholder="Enter Plant Type" style="margin-top: 20px; width: 200px;">
+
+    </img>
+
+    <h2>Captured Photos</h2>
+    <div id="photosContainer" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photo = document.getElementById('photo');
+        const captureButton = document.getElementById('captureButton');
+        const saveButton = document.getElementById('saveButton');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const plantNameInput = document.getElementById('plantName');
+        const plantName = plantNameInput.value;
+        const now = Date().toLocaleString();
+
+        const db = indexedDB.open("PlantPhotos", 1);
+        db.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains("photos")) {
+                db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
+            }
+        };
+
+        db.onsuccess = function (event) {
+            console.log("Database opened successfully");
+        };
+
+        db.onerror = function (event) {
+            console.error("Database error:", event.target.errorCode);
+        };
+
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment'
+                    }
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Error accessing the camera", err);
+            }
+        }
+
+        saveButton.addEventListener('click', () => {
+            const imageDataUrl = canvas.toDataURL('image/jpeg');
+            const link = document.createElement('a');
+            link.href = imageDataUrl;
+            console.log("Saving photo with name:", plantName + now + '.jpg');
+            link.download = plantName + now + '.jpg';
+            document.body.appendChild(link);
+            link.click();
+
+            const transaction = db.result.transaction("photos", "readwrite");
+            const photosStore = transaction.objectStore("photos");
+            const photoData = {
+                plantName: plantName,
+                timestamp: now,
+                image: imageDataUrl
+            };
+            const request = photosStore.add(photoData);
+            request.onsuccess = function () {
+                console.log("Photo saved to IndexedDB:", photoData);
+                loadPhotos();
+            };
+            request.onerror = function (event) {
+                console.error("Error saving photo to IndexedDB:", event.target.errorCode);
+            };
+        });
+
+        captureButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageDataUrl = canvas.toDataURL('image/jpeg');
+            photo.src = imageDataUrl;
+        });
+
+        function loadPhotos() {
+            const transaction = db.result.transaction("photos", "readonly");
+            const photosStore = transaction.objectStore("photos");
+            const request = photosStore.getAll();
+            request.onsuccess = function (event) {
+                const photos = event.target.result;
+                console.log("Loaded photos from IndexedDB:", photos);
+                photosContainer.innerHTML = '';
+                photos.forEach(photoData => {
+                    const img = document.createElement('img');
+                    img.src = photoData.image;
+                    img.alt = photoData.plantName + ' - ' + photoData.timestamp;
+                    img.style.width = '150px';
+                    img.style.height = 'auto';
+                    img.style.margin = '10px';
+                    photosContainer.appendChild(img);
+                });
+            };
+            request.onerror = function (event) {
+                console.error("Error loading photos from IndexedDB:", event.target.errorCode);
+            };
+        }
+
+        // Start the camera when the page loads
+        window.addEventListener('load', startCamera);
+    </script>
+</body>
+
+</html>
