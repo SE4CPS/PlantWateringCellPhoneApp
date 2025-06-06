@@ -4,19 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Access and Photo Capture</title>
+    <title>Plant Watering App</title>
     <style>
+        * {
+            /* border-radius: 40px; */
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             text-align: center;
-            padding: 20px;
+            padding: 0px;
+            margin: 0px;
         }
 
         #video {
             width: 100%;
-            max-width: 640px;
+            max-width: 350px;
             height: auto;
             border: 1px solid #ddd;
+            border-radius: 200px;
         }
 
         #photo {
@@ -33,28 +39,123 @@
             margin-top: 20px;
             cursor: pointer;
         }
+
+        #errorMessageId {
+            background-color: #f44336;
+            padding: 10px;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: none;
+        }
+
+        #warningMessageId {
+            background-color: #827717;
+            padding: 10px;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: none;
+        }
+
+        button,
+        input[type="text"] {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 20px 10px;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            background-color: #7CB342;
+            color: #333;
+            cursor: pointer;
+        }
+
+        /* Style the tab buttons */
+        .tablink {
+            background-color: #555;
+            color: white;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 17px;
+            width: 25%;
+        }
+
+        /* Change background color of buttons on hover */
+        .tablink:hover {
+            background-color: #777;
+        }
+
+        /* Set default styles for tab content */
+        .tabcontent {
+            color: white;
+            display: none;
+            padding: 50px;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body style="background-color: #a1c9a1;">
-    <h1>Plant Water Recommendation App</h1>
 
-    <video id="video" autoplay playsinline></video>
+    <header style="height: 200px; background-image: url('header.avif');">;
+        <h1>Plant Watering App</h1>
+    </header>
 
-    <br>
+    <button class="tablink" onclick="openCity('Tokyo', this, 'blue')">Home</button>
+    <button class="tablink" onclick="openCity('Oslo', this, 'orange')">Camera</button>
+    <button class="tablink" onclick="openCity('Oslo', this, 'orange')">Gallery</button>
+    <button class="tablink" onclick="openCity('Oslo', this, 'orange')">...</button>
 
-    <button id="captureButton" style="bottom: 40px; left: 10px; right: 10px; display: fixed;">Take Photo</button>
-    <canvas id="canvas" style="display:none;"></canvas>
-    <img id="photo" alt="Captured Photo" style="display: block; margin-top: 20px;">
+    <div id="London" class="tabcontent">
+        <h1>Welcome</h1>
+        <p>...</p>
+    </div>
 
-    <button id="analyzeButton" style="bottom: 40; left: 10; right: 10; position: relative;">Analyze Photo</button>
-    <button id="saveButton" style="bottom: 40; left: 10; right: 10; position: relative;">Save Photo</button>
-    <input type="text" id="plantName" placeholder="Enter Plant Type" style="margin-top: 20px; width: 200px;">
+    <div id="Paris" class="tabcontent">
+        <h1>Paris</h1>
+        <p>Paris is the capital of France.</p>
+    </div>
 
-    </img>
+    <div id="Tokyo" class="tabcontent">
+        <h1>Tokyo</h1>
+        <p>Tokyo is the capital of Japan.</p>
+    </div>
 
+    <div id="Oslo" class="tabcontent">
+        <h1>Oslo</h1>
+        <p>Oslo is the capital of Norway.</p>
+    </div>
+
+
+    <section id="errorMessageId"></section>
+    <section id="warningMessageId">Low Battery: Please charge device</section>
+
+    <section
+        style="display: flex; justify-content: center; align-items: center; flex-direction: row; gap: 5px; margin-top: 20px;">
+
+        <section id="cameraSection" style="margin-bottom: 20px;width: 50%;">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <img id="photo" alt="Captured Photo" style="display: block; margin-top: 20px;"></img>
+        </section>
+
+        <section id="plantSection" style="width: 50%;">
+            <button id="captureButton">Take Photo</button>
+            <button id="analyzeButton">Analyze Photo</button>
+            <input type="text" id="plantName" placeholder="Enter Plant Type">
+            <button id="saveButton">Save Photo</button>
+        </section>
+
+    </section>
+
+    <!-- 
     <h2>Captured Photos</h2>
-    <div id="photosContainer" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+    <div id="photosContainer" style="display: flex; flex-wrap: wrap; justify-content: center;"></div> -->
 
 
     <script>
@@ -95,6 +196,11 @@
                 video.srcObject = stream;
             } catch (err) {
                 console.error("Error accessing the camera", err);
+                const errorMessage = document.getElementById('errorMessageId');
+                errorMessage.innerHTML = `<p>Error accessing the camera: ${err.message}</p>`;
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
             }
         }
 
@@ -155,8 +261,67 @@
             };
         }
 
+        function checkBatteryStatus() {
+            navigator.getBattery().then(battery => {
+                if (battery.level < 0.1) { // If battery level is less than 20%
+                    const warningMessage = document.getElementById('warningMessageId');
+                    warningMessage.style.display = 'block';
+                    warningMessage.innerHTML = `<p>Low Battery: Please charge your device</p>`;
+                } else {
+                    const warningMessage = document.getElementById('warningMessageId');
+                    warningMessage.style.display = 'none';
+                }
+            }).catch(err => {
+                console.error("Error checking battery status:", err);
+            });
+        }
+
         // Start the camera when the page loads
+        checkBatteryStatus();
+
+        function openCity(cityName, elmnt, color) {
+            // Hide all elements with class="tabcontent" by default */
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Remove the background color of all tablinks/buttons
+            tablinks = document.getElementsByClassName("tablink");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].style.backgroundColor = "";
+            }
+
+            // Show the specific tab content
+            document.getElementById(cityName).style.display = "block";
+
+            // Add the specific color to the button used to open the tab content
+            elmnt.style.backgroundColor = color;
+        }
+
+        // Get the element with id="defaultOpen" and click on it
+        document.getElementById("defaultOpen").click();
+
         window.addEventListener('load', startCamera);
+
+        async function getData() {
+            // sk-O4Vg68431f0dc1a5010877
+            const url = "https://perenual.com/api/v2/species-list?key=sk-O4Vg68431f0dc1a5010877"
+            try {
+                const response = await fetch(url)
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`)
+                }
+
+                const json = await response.json()
+                console.log(json)
+            } catch (error) {
+                console.error(error.message)
+            }
+        }
+
+        getData()
     </script>
 </body>
 
