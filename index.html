@@ -2,327 +2,340 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plant Watering App</title>
-    <style>
-        * {
-            /* border-radius: 40px; */
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Watering App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            text-align: center;
-            padding: 0px;
-            margin: 0px;
-        }
+    body {
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background-color: #a1c9a1;
+      font-size: 16px;
+      color: #333;
+    }
 
-        #video {
-            width: 100%;
-            max-width: 350px;
-            height: auto;
-            border: 1px solid #ddd;
-            border-radius: 200px;
-        }
+    header {
+      background-image: url('header.avif');
+      background-size: cover;
+      background-position: center;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-        #photo {
-            width: 100%;
-            max-width: 640px;
-            height: auto;
-            border: 1px solid #ddd;
-            margin-top: 20px;
-        }
+    header h1 {
+      color: white;
+      font-size: 1.8rem;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+    }
 
-        #captureButton {
-            font-size: 18px;
-            padding: 10px 20px;
-            margin-top: 20px;
-            cursor: pointer;
-        }
+    .tabbar {
+      display: flex;
+      justify-content: space-around;
+      background-color: #4caf50;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-        #errorMessageId {
-            background-color: #f44336;
-            padding: 10px;
-            color: white;
-            font-size: 20px;
-            margin-bottom: 4px;
-            display: none;
-        }
+    .tablink {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      color: white;
+      background-color: #4caf50;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+    }
 
-        #warningMessageId {
-            background-color: #827717;
-            padding: 10px;
-            color: white;
-            font-size: 20px;
-            margin-bottom: 4px;
-            display: none;
-        }
+    .tablink:hover {
+      background-color: #66bb6a;
+    }
 
-        button,
-        input[type="text"] {
-            display: block;
-            width: 100%;
-            margin-bottom: 20px;
-            padding: 20px 10px;
-            font-size: 18px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-            background-color: #7CB342;
-            color: #333;
-            cursor: pointer;
-        }
+    .tabcontent {
+      display: none;
+      padding: 20px;
+    }
 
-        /* Style the tab buttons */
-        .tablink {
-            background-color: #555;
-            color: white;
-            float: left;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            font-size: 17px;
-            width: 25%;
-        }
+    .tabcontent h1 {
+      color: #2e7d32;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
 
-        /* Change background color of buttons on hover */
-        .tablink:hover {
-            background-color: #777;
-        }
+    p {
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
 
-        /* Set default styles for tab content */
-        .tabcontent {
-            color: white;
-            display: none;
-            padding: 50px;
-            text-align: center;
-        }
-    </style>
+    video,
+    img {
+      width: 100%;
+      max-width: 320px;
+      margin: 10px auto;
+      display: block;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      max-width: 320px;
+      margin: 10px auto;
+      display: block;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #81c784;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #66bb6a;
+    }
+
+    #errorMessageId,
+    #warningMessageId {
+      padding: 10px;
+      margin: 10px 0;
+      display: none;
+      text-align: center;
+    }
+
+    #errorMessageId {
+      background-color: #e53935;
+      color: white;
+    }
+
+    #warningMessageId {
+      background-color: #fbc02d;
+      color: black;
+    }
+
+    a {
+      color: #2e7d32;
+      text-decoration: underline;
+    }
+
+    #photosContainer img {
+      width: 100px;
+      margin: 5px;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 
-<body style="background-color: #a1c9a1;">
+<body>
+  <header>
+    <h1>Plant Watering App</h1>
+  </header>
 
-    <header style="height: 200px; background-image: url('header.avif');">;
-        <h1>Plant Watering App</h1>
-    </header>
+  <nav class="tabbar">
+    <button class="tablink" data-tab="HomeContent">Home</button>
+    <button class="tablink" data-tab="CameraContent">Camera</button>
+    <button class="tablink" data-tab="GalleryContent">Gallery</button>
+    <button class="tablink" data-tab="ContactContent">Contact</button>
+  </nav>
 
-    <button class="tablink" onclick="openCity('Tokyo', this, 'blue')">Home</button>
-    <button class="tablink" onclick="openCity('Oslo', this, 'orange')">Camera</button>
-    <button class="tablink" onclick="openCity('Oslo', this, 'orange')">Gallery</button>
-    <button class="tablink" onclick="openCity('Oslo', this, 'orange')">...</button>
+  <div id="HomeContent" class="tabcontent">
+    <h1>Welcome to the Plant Watering App</h1>
+    <p>This app helps support plant care and reduce water waste.</p>
+    <p>Developed in Summer 2025 as part of a two-week mobile app workshop.</p>
+  </div>
 
-    <div id="London" class="tabcontent">
-        <h1>Welcome</h1>
-        <p>...</p>
-    </div>
+  <div id="CameraContent" class="tabcontent">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="photo" alt="Captured Photo">
+    <button id="captureButton">Take Photo</button>
+    <button id="saveButton">Save Photo</button>
+    <button id="deleteButton">Delete Photo</button>
+  </div>
 
-    <div id="Paris" class="tabcontent">
-        <h1>Paris</h1>
-        <p>Paris is the capital of France.</p>
-    </div>
-
-    <div id="Tokyo" class="tabcontent">
-        <h1>Tokyo</h1>
-        <p>Tokyo is the capital of Japan.</p>
-    </div>
-
-    <div id="Oslo" class="tabcontent">
-        <h1>Oslo</h1>
-        <p>Oslo is the capital of Norway.</p>
-    </div>
-
-
+  <div id="GalleryContent" class="tabcontent">
     <section id="errorMessageId"></section>
-    <section id="warningMessageId">Low Battery: Please charge device</section>
+    <section id="warningMessageId"></section>
+    <div id="photosContainer"></div>
+    <button id="analyzeButton">Analyze Photo</button>
+  </div>
 
-    <section
-        style="display: flex; justify-content: center; align-items: center; flex-direction: row; gap: 5px; margin-top: 20px;">
+  <div id="ContactContent" class="tabcontent">
+    <p>Want to contribute? Visit our open-source project on GitHub:</p>
+    <p><a href="https://github.com/SE4CPS/PlantWateringCellPhoneApp/" target="_blank">GitHub Repository</a></p>
+  </div>
 
-        <section id="cameraSection" style="margin-bottom: 20px;width: 50%;">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="canvas" style="display:none;"></canvas>
-            <img id="photo" alt="Captured Photo" style="display: block; margin-top: 20px;"></img>
-        </section>
+  <script>
+    function openTab(tabId, element) {
+      document.querySelectorAll('.tabcontent').forEach(c => c.style.display = 'none');
+      document.querySelectorAll('.tablink').forEach(t => t.style.backgroundColor = '#4caf50');
+      document.getElementById(tabId).style.display = 'block';
+      element.style.backgroundColor = '#66bb6a';
+    }
 
-        <section id="plantSection" style="width: 50%;">
-            <button id="captureButton">Take Photo</button>
-            <button id="analyzeButton">Analyze Photo</button>
-            <input type="text" id="plantName" placeholder="Enter Plant Type">
-            <button id="saveButton">Save Photo</button>
-        </section>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.tablink').forEach(button => {
+        button.addEventListener('click', () => {
+          openTab(button.getAttribute('data-tab'), button);
+        });
+      });
+      document.querySelector('.tablink').click(); // Open default tab
+    });
 
-    </section>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photo = document.getElementById('photo');
+    const captureButton = document.getElementById('captureButton');
+    const saveButton = document.getElementById('saveButton');
+    const deleteButton = document.getElementById('deleteButton');
+    const analyzeButton = document.getElementById('analyzeButton');
+    const now = new Date().toLocaleString();
 
-    <!-- 
-    <h2>Captured Photos</h2>
-    <div id="photosContainer" style="display: flex; flex-wrap: wrap; justify-content: center;"></div> -->
+    const db = indexedDB.open("PlantPhotos", 1);
+    db.onupgradeneeded = function (event) {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains("photos")) {
+        db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
+      }
+    };
+    db.onsuccess = function () {
+      console.log("Database opened successfully");
+    };
+    db.onerror = function (event) {
+      console.error("Database error:", event.target.errorCode);
+    };
 
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        video.srcObject = stream;
+      } catch (err) {
+        const errorMessage = document.getElementById('errorMessageId');
+        errorMessage.style.display = 'block';
+        errorMessage.innerHTML = `<p>Error accessing the camera: ${err.message}</p>`;
+        setTimeout(() => errorMessage.style.display = 'none', 5000);
+      }
+    }
 
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const photo = document.getElementById('photo');
-        const captureButton = document.getElementById('captureButton');
-        const saveButton = document.getElementById('saveButton');
-        const analyzeButton = document.getElementById('analyzeButton');
-        const plantNameInput = document.getElementById('plantName');
-        const plantName = plantNameInput.value;
-        const now = Date().toLocaleString();
+    captureButton.addEventListener('click', () => {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      photo.src = canvas.toDataURL('image/jpeg');
+    });
 
-        const db = indexedDB.open("PlantPhotos", 1);
-        db.onupgradeneeded = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("photos")) {
-                db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
-            }
-        };
+    deleteButton.addEventListener('click', () => {
+      photo.src = '';
+    });
 
-        db.onsuccess = function (event) {
-            console.log("Database opened successfully");
-        };
+    saveButton.addEventListener('click', () => {
+      const imageDataUrl = canvas.toDataURL('image/jpeg');
+      const link = document.createElement('a');
+      link.href = imageDataUrl;
+      link.download = now + '.jpg';
+      document.body.appendChild(link);
+      link.click();
 
-        db.onerror = function (event) {
-            console.error("Database error:", event.target.errorCode);
-        };
+      const transaction = db.result.transaction("photos", "readwrite");
+      const store = transaction.objectStore("photos");
+      const data = { timestamp: now, image: imageDataUrl };
 
+      const request = store.add(data);
+      request.onsuccess = () => {
+        console.log("Saved to IndexedDB", data);
+        loadPhotos();
+      };
+      request.onerror = event => {
+        console.error("IndexedDB save error:", event.target.errorCode);
+      };
+    });
 
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'environment'
-                    }
-                });
-                video.srcObject = stream;
-            } catch (err) {
-                console.error("Error accessing the camera", err);
-                const errorMessage = document.getElementById('errorMessageId');
-                errorMessage.innerHTML = `<p>Error accessing the camera: ${err.message}</p>`;
-                setTimeout(() => {
-                    errorMessage.style.display = 'none';
-                }, 5000);
-            }
+    function loadPhotos() {
+      const transaction = db.result.transaction("photos", "readonly");
+      const store = transaction.objectStore("photos");
+      const request = store.getAll();
+      const container = document.getElementById('photosContainer');
+
+      request.onsuccess = event => {
+        const photos = event.target.result;
+        container.innerHTML = '';
+        photos.forEach(photoData => {
+          const img = document.createElement('img');
+          img.src = photoData.image;
+          img.alt = photoData.timestamp;
+          container.appendChild(img);
+        });
+      };
+      request.onerror = event => {
+        console.error("Load error:", event.target.errorCode);
+      };
+    }
+
+    function checkBatteryStatus() {
+      navigator.getBattery().then(battery => {
+        const warningMessage = document.getElementById('warningMessageId');
+        if (battery.level < 0.1) {
+          warningMessage.style.display = 'block';
+          warningMessage.innerHTML = `<p>Low Battery: Please charge your device</p>`;
+        } else {
+          warningMessage.style.display = 'none';
         }
+      }).catch(err => {
+        console.error("Battery check failed:", err);
+      });
+    }
 
-        saveButton.addEventListener('click', () => {
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
-            const link = document.createElement('a');
-            link.href = imageDataUrl;
-            console.log("Saving photo with name:", plantName + now + '.jpg');
-            link.download = plantName + now + '.jpg';
-            document.body.appendChild(link);
-            link.click();
+    async function getData() {
+      const url = "https://perenual.com/api/v2/species-list?key=sk-O4Vg68431f0dc1a5010877";
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error("getData error:", error.message);
+      }
+    }
 
-            const transaction = db.result.transaction("photos", "readwrite");
-            const photosStore = transaction.objectStore("photos");
-            const photoData = {
-                plantName: plantName,
-                timestamp: now,
-                image: imageDataUrl
-            };
-            const request = photosStore.add(photoData);
-            request.onsuccess = function () {
-                console.log("Photo saved to IndexedDB:", photoData);
-                loadPhotos();
-            };
-            request.onerror = function (event) {
-                console.error("Error saving photo to IndexedDB:", event.target.errorCode);
-            };
+    async function analyzeFlower() {
+      const apiKey = 'becKndDovsMw5Ap7zZp5DGfb10B94y1c6CkM1Jy3bUQ4qLzmvU';
+      const apiUrl = 'https://plant.id/api/v3/identification';
+      const flowerData = [photo.src]; // Use captured image
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'x-api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ images: flowerData })
         });
 
-        captureButton.addEventListener('click', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
-            photo.src = imageDataUrl;
-        });
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        const result = await response.json();
+        console.log("Plant ID result:", result);
+      } catch (err) {
+        console.error("Analyze error:", err.message);
+      }
+    }
 
-        function loadPhotos() {
-            const transaction = db.result.transaction("photos", "readonly");
-            const photosStore = transaction.objectStore("photos");
-            const request = photosStore.getAll();
-            request.onsuccess = function (event) {
-                const photos = event.target.result;
-                console.log("Loaded photos from IndexedDB:", photos);
-                photosContainer.innerHTML = '';
-                photos.forEach(photoData => {
-                    const img = document.createElement('img');
-                    img.src = photoData.image;
-                    img.alt = photoData.plantName + ' - ' + photoData.timestamp;
-                    img.style.width = '150px';
-                    img.style.height = 'auto';
-                    img.style.margin = '10px';
-                    photosContainer.appendChild(img);
-                });
-            };
-            request.onerror = function (event) {
-                console.error("Error loading photos from IndexedDB:", event.target.errorCode);
-            };
-        }
+    analyzeButton.addEventListener('click', analyzeFlower);
 
-        function checkBatteryStatus() {
-            navigator.getBattery().then(battery => {
-                if (battery.level < 0.1) { // If battery level is less than 20%
-                    const warningMessage = document.getElementById('warningMessageId');
-                    warningMessage.style.display = 'block';
-                    warningMessage.innerHTML = `<p>Low Battery: Please charge your device</p>`;
-                } else {
-                    const warningMessage = document.getElementById('warningMessageId');
-                    warningMessage.style.display = 'none';
-                }
-            }).catch(err => {
-                console.error("Error checking battery status:", err);
-            });
-        }
-
-        // Start the camera when the page loads
-        checkBatteryStatus();
-
-        function openCity(cityName, elmnt, color) {
-            // Hide all elements with class="tabcontent" by default */
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-
-            // Remove the background color of all tablinks/buttons
-            tablinks = document.getElementsByClassName("tablink");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].style.backgroundColor = "";
-            }
-
-            // Show the specific tab content
-            document.getElementById(cityName).style.display = "block";
-
-            // Add the specific color to the button used to open the tab content
-            elmnt.style.backgroundColor = color;
-        }
-
-        // Get the element with id="defaultOpen" and click on it
-        document.getElementById("defaultOpen").click();
-
-        window.addEventListener('load', startCamera);
-
-        async function getData() {
-            // sk-O4Vg68431f0dc1a5010877
-            const url = "https://perenual.com/api/v2/species-list?key=sk-O4Vg68431f0dc1a5010877"
-            try {
-                const response = await fetch(url)
-                if (!response.ok) {
-                    throw new Error(`Response status: ${response.status}`)
-                }
-
-                const json = await response.json()
-                console.log(json)
-            } catch (error) {
-                console.error(error.message)
-            }
-        }
-
-        getData()
-    </script>
+    window.addEventListener('load', () => {
+      startCamera();
+      checkBatteryStatus();
+      getData();
+    });
+  </script>
 </body>
 
 </html>
