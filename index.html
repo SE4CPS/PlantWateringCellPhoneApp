@@ -376,17 +376,15 @@
             }
         }
 
-
-        
 async function analyzeFlower() {
     const apiUrl = 'https://api.plant.id/v2/identify';  // API URL
     const apiKey = 'EMbFXNroI2TKDVZtYvJAVmQ3s7LMuqF7DWXKk30M0aHAKUzySC';  // API Key
     const accessToken = '';  // Access Token (if needed)
 
-    // Example image URL (change to your actual URL or captured image data)
+    // Example image URL (replace with your actual image URL)
     const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg';
 
-    // Convert the image URL to Base64
+    // Convert the image URL to Base64 and send it as a list of Base64 strings
     const flowerData = [await convertToBase64(imageUrl)];
 
     // Request body for identification
@@ -449,12 +447,11 @@ async function convertToBase64(imageUrl) {
     const blob = await response.blob();
     const reader = new FileReader();
     return new Promise((resolve, reject) => {
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+        reader.onloadend = () => resolve(reader.result);  // Resolve with the Base64 string
+        reader.onerror = reject;  // Reject on error
+        reader.readAsDataURL(blob);  // Start reading the image as a Base64 string
     });
 }
-
 
         analyzeButton.addEventListener('click', analyzeFlower);
 
