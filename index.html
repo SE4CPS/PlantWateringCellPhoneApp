@@ -376,15 +376,18 @@
             }
         }
 
+
+        
 async function analyzeFlower() {
     const apiUrl = 'https://api.plant.id/v2/identify';  // API URL
     const apiKey = 'EMbFXNroI2TKDVZtYvJAVmQ3s7LMuqF7DWXKk30M0aHAKUzySC';  // API Key
-    const accessToken = '';  // Access Token (leave empty if not needed)
+    const accessToken = '';  // Access Token (if needed)
 
-    // Image data (Base64 encoded or URL)
-    const flowerData = [
-        "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/"  // Example Base64 encoded image string
-    ];
+    // Example image URL (change to your actual URL or captured image data)
+    const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg';
+
+    // Convert the image URL to Base64
+    const flowerData = [await convertToBase64(imageUrl)];
 
     // Request body for identification
     const requestBody = {
@@ -395,7 +398,7 @@ async function analyzeFlower() {
             latitude: 49.207,  // Latitude for accuracy
             longitude: 16.608,  // Longitude for accuracy
             similar_images: true,  // Enable similar images in the response
-            images: flowerData,  // The list of images to analyze
+            images: flowerData,  // The list of images to analyze (Base64)
             datetime: new Date().toISOString(),  // Current timestamp for the image
         }
     };
@@ -440,6 +443,17 @@ async function analyzeFlower() {
     }
 }
 
+// Helper function to convert image URL to Base64
+async function convertToBase64(imageUrl) {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
 
 
         analyzeButton.addEventListener('click', analyzeFlower);
