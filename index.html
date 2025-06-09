@@ -378,15 +378,17 @@
 
 async function analyzeFlower() {
     const apiUrl = 'https://api.plant.id/v2/identify';  // API URL
-    const apiKey = 'EMbFXNroI2TKDVZtYvJAVmQ3s7LMuqF7DWXKk30M0aHAKUzySC';  // Replace with your API Key
-    const accessToken = '';  // Access Token (if needed)
+    const apiKey = 'EMbFXNroI2TKDVZtYvJAVmQ3s7LMuqF7DWXKk30M0aHAKUzySC';  // API Key
+    const accessToken = '';  // Access Token (leave empty if not needed)
 
     // Image data (Base64 encoded or URL)
-    const flowerData = "images": ["data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/"]
+    const flowerData = [
+        "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAAAAD/"  // Example Base64 encoded image string
+    ];
 
     // Request body for identification
     const requestBody = {
-        access_token: accessToken,  // Your provided access token
+        access_token: accessToken,  // Your access token if needed
         model_version: 'plant_id:3.1.0',
         custom_id: null,  // Custom ID (optional)
         input: {
@@ -409,7 +411,8 @@ async function analyzeFlower() {
         });
 
         if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
+            const errorText = await response.text();  // Get detailed error message
+            throw new Error(`API error: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json();
@@ -436,6 +439,7 @@ async function analyzeFlower() {
         alert('An error occurred during the analysis. Please try again.');
     }
 }
+
 
 
         analyzeButton.addEventListener('click', analyzeFlower);
