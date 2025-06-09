@@ -377,23 +377,35 @@
         }
 
 async function analyzeFlower() {
-    const apiKey = 'becKndDovsMw5Ap7zZp5DGfb10B94y1c6CkM1Jy3bUQ4qLzmvU';
-    const apiUrl = 'https://plant.id/api/v3/identification';
+    const apiUrl = 'https://api.plant.id/v2/identify';  // API URL
+    const apiKey = 'EMbFXNroI2TKDVZtYvJAVmQ3s7LMuqF7DWXKk30M0aHAKUzySC';  // Replace with your API Key
+    const accessToken = '';  // Access Token (if needed)
 
-    // Fixture image URL for testing
-    const fixtureImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg';
+    // Image data (Base64 encoded or URL)
+    const flowerData = [photo.src || 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg'];
 
-    // If no photo has been captured, use the fixture image URL
-    const flowerData = [photo.src || fixtureImageUrl];
+    // Request body for identification
+    const requestBody = {
+        access_token: accessToken,  // Your provided access token
+        model_version: 'plant_id:3.1.0',
+        custom_id: null,  // Custom ID (optional)
+        input: {
+            latitude: 49.207,  // Latitude for accuracy
+            longitude: 16.608,  // Longitude for accuracy
+            similar_images: true,  // Enable similar images in the response
+            images: flowerData,  // The list of images to analyze
+            datetime: new Date().toISOString(),  // Current timestamp for the image
+        }
+    };
 
     try {
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'x-api-key': apiKey,
+                'Api-Key': apiKey,  // Include API key in headers
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ images: flowerData })
+            body: JSON.stringify(requestBody)  // Send the request body
         });
 
         if (!response.ok) {
@@ -403,12 +415,20 @@ async function analyzeFlower() {
         const result = await response.json();
         console.log("Plant ID result:", result);
 
-        // Check if the result contains any error or invalid data
-        if (result.error) {
-            alert(`Error: ${result.error.message}`);
+        // Handle the result based on the API response
+        if (result.status === 'COMPLETED' && result.result) {
+            const classification = result.result.classification.suggestions[0];
+            if (classification) {
+                console.log(`Plant Name: ${classification.name}`);
+                console.log(`Similarity: ${classification.probability}`);
+                console.log(`Suggested Image URL: ${classification.similar_images[0].url}`);
+
+                alert(`Flower identified as: ${classification.name}\nSimilarity: ${classification.probability}`);
+            } else {
+                alert('No plant found.');
+            }
         } else {
-            alert('Flower identified successfully!');
-            console.log('Identification Result:', result);
+            alert('Error in plant identification.');
         }
 
     } catch (err) {
@@ -416,6 +436,7 @@ async function analyzeFlower() {
         alert('An error occurred during the analysis. Please try again.');
     }
 }
+
 
         analyzeButton.addEventListener('click', analyzeFlower);
 
