@@ -384,24 +384,32 @@ async function analyzeFlower() {
     // Example image URL (replace with your actual image URL)
     const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg';
 
-    // Convert the image URL to Base64 and send it as a list of Base64 strings
-    const flowerData = [await convertToBase64(imageUrl)];
-
-    // Request body for identification
-    const requestBody = {
-        access_token: accessToken,  // Your access token if needed
-        model_version: 'plant_id:3.1.0',
-        custom_id: null,  // Custom ID (optional)
-        input: {
-            latitude: 49.207,  // Latitude for accuracy
-            longitude: 16.608,  // Longitude for accuracy
-            similar_images: true,  // Enable similar images in the response
-            images: flowerData,  // The list of images to analyze (Base64)
-            datetime: new Date().toISOString(),  // Current timestamp for the image
-        }
-    };
-
     try {
+        // Convert the image URL to Base64 and send it as a list of Base64 strings
+        const flowerData = [await convertToBase64(imageUrl)];
+
+        // Debug: Log the flowerData to ensure it's properly encoded as Base64
+        console.log("Base64 Encoded Flower Data:", flowerData);
+
+        // Check if flowerData is an array and contains a valid Base64 string
+        if (!Array.isArray(flowerData) || flowerData.length === 0 || !flowerData[0].startsWith('data:image')) {
+            throw new Error("Invalid Base64 image format or missing Base64 data.");
+        }
+
+        // Request body for identification
+        const requestBody = {
+            access_token: accessToken,  // Your access token if needed
+            model_version: 'plant_id:3.1.0',
+            custom_id: null,  // Custom ID (optional)
+            input: {
+                latitude: 49.207,  // Latitude for accuracy
+                longitude: 16.608,  // Longitude for accuracy
+                similar_images: true,  // Enable similar images in the response
+                images: flowerData,  // The list of images to analyze (Base64)
+                datetime: new Date().toISOString(),  // Current timestamp for the image
+            }
+        };
+
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -452,6 +460,7 @@ async function convertToBase64(imageUrl) {
         reader.readAsDataURL(blob);  // Start reading the image as a Base64 string
     });
 }
+
 
         analyzeButton.addEventListener('click', analyzeFlower);
 
