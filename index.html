@@ -376,29 +376,48 @@
             }
         }
 
-        async function analyzeFlower() {
-            const apiKey = 'becKndDovsMw5Ap7zZp5DGfb10B94y1c6CkM1Jy3bUQ4qLzmvU';
-            const apiUrl = 'https://plant.id/api/v3/identification';
-            const flowerData = [photo.src]; // Use captured image
+async function analyzeFlower() {
+    const apiKey = 'becKndDovsMw5Ap7zZp5DGfb10B94y1c6CkM1Jy3bUQ4qLzmvU';
+    const apiUrl = 'https://plant.id/api/v3/identification';
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': apiKey,
-                        'Content-Type': 'application/json',
-                        mode: 'cors'
-                    },
-                    body: JSON.stringify({ images: flowerData })
-                });
+    // Fixture image URL for testing
+    const fixtureImageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg';
 
-                if (!response.ok) throw new Error(`API error: ${response.status}`);
-                const result = await response.json();
-                console.log("Plant ID result:", result);
-            } catch (err) {
-                console.error("Analyze error:", err.message);
-            }
+    // If no photo has been captured, use the fixture image URL
+    const flowerData = [photo.src || fixtureImageUrl];
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'x-api-key': apiKey,
+                'Content-Type': 'application/json',
+                'mode': 'cors'
+            },
+            body: JSON.stringify({ images: flowerData })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
         }
+
+        const result = await response.json();
+        console.log("Plant ID result:", result);
+
+        // Check if the result contains any error or invalid data
+        if (result.error) {
+            alert(`Error: ${result.error.message}`);
+        } else {
+            alert('Flower identified successfully!');
+            console.log('Identification Result:', result);
+        }
+
+    } catch (err) {
+        console.error("Analyze error:", err.message);
+        alert('An error occurred during the analysis. Please try again.');
+    }
+}
+
 
         analyzeButton.addEventListener('click', analyzeFlower);
 
