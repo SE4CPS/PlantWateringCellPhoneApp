@@ -392,7 +392,6 @@ async function analyzeFlower() {
             headers: {
                 'x-api-key': apiKey,
                 'Content-Type': 'application/json',
-                'mode': 'cors'
             },
             body: JSON.stringify({ images: flowerData })
         });
@@ -417,7 +416,6 @@ async function analyzeFlower() {
         alert('An error occurred during the analysis. Please try again.');
     }
 }
-
 
         analyzeButton.addEventListener('click', analyzeFlower);
 
