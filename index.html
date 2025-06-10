@@ -377,70 +377,42 @@
         }
 
 async function analyzeFlower() {
-    const apiUrl = 'https://api.plant.id/v2/identify';  // API URL
-    const apiKey = 'EMbFXNroI2TKDVZtYvJAVmQ3s7LMuqF7DWXKk30M0aHAKUzySC';  // API Key
-    const accessToken = '';  // Access Token (if needed)
+    const apiUrl = 'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10lKE5W6Q5K5ajPWxctu7qe'; // New API URL
 
-    // Example image URL (replace with your actual image URL)
-    const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flower_jtca001.jpg/1280px-Flower_jtca001.jpg';
+    // Reading the rose.png file directly from the same directory
+    const imageUrl = 'rose.png'; // Path to the image (in the same directory as the HTML file)
 
     try {
-        // Convert the image URL to Base64 and send it as a list of Base64 strings
-        const flowerData = [await convertToBase64(imageUrl)];
+        // Fetch the image file as a Blob
+        const imageBlob = await fetch(imageUrl).then(res => res.blob());
 
-        // Debug: Log the flowerData to ensure it's properly encoded as Base64
-        console.log("Base64 Encoded Flower Data:", flowerData);
-
-        // Check if flowerData is an array and contains a valid Base64 string
-        if (!Array.isArray(flowerData) || flowerData.length === 0 || !flowerData[0].startsWith('data:image')) {
-            throw new Error("Invalid Base64 image format or missing Base64 data.");
-        }
-
-        // Request body for identification
-        const requestBody = {
-            access_token: accessToken,  // Your access token if needed
-            model_version: 'plant_id:3.1.0',
-            custom_id: null,  // Custom ID (optional)
-            input: {
-                latitude: 49.207,  // Latitude for accuracy
-                longitude: 16.608,  // Longitude for accuracy
-                similar_images: true,  // Enable similar images in the response
-                images: flowerData,  // The list of images to analyze (Base64)
-                datetime: new Date().toISOString(),  // Current timestamp for the image
-            }
-        };
+        const formData = new FormData();
+        formData.append('images', imageBlob, 'rose.png');  // Appending the image as multipart/form-data
 
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'Api-Key': apiKey,  // Include API key in headers
-                'Content-Type': 'application/json',
+                'accept': 'application/json', // Accepting JSON response
             },
-            body: JSON.stringify(requestBody)  // Send the request body
+            body: formData, // Sending the FormData with image
         });
 
         if (!response.ok) {
-            const errorText = await response.text();  // Get detailed error message
+            const errorText = await response.text();
             throw new Error(`API error: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json();
-        console.log("Plant ID result:", result);
+        console.log("PlantNet result:", result);
 
-        // Handle the result based on the API response
-        if (result.status === 'COMPLETED' && result.result) {
-            const classification = result.result.classification.suggestions[0];
-            if (classification) {
-                console.log(`Plant Name: ${classification.name}`);
-                console.log(`Similarity: ${classification.probability}`);
-                console.log(`Suggested Image URL: ${classification.similar_images[0].url}`);
+        if (result.status === 'OK' && result.results.length > 0) {
+            const bestMatch = result.results[0];
+            const plantName = bestMatch.scientificName || 'Unknown Plant';
+            const confidence = bestMatch.probability || 'N/A';
 
-                alert(`Flower identified as: ${classification.name}\nSimilarity: ${classification.probability}`);
-            } else {
-                alert('No plant found.');
-            }
+            alert(`Flower identified as: ${plantName}\nConfidence: ${confidence}`);
         } else {
-            alert('Error in plant identification.');
+            alert('No plant identified.');
         }
 
     } catch (err) {
@@ -449,27 +421,7 @@ async function analyzeFlower() {
     }
 }
 
-// Helper function to convert image URL to Base64
-// Helper function to convert image URL to Base64 without the prefix
-async function convertToBase64(imageUrl) {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    const reader = new FileReader();
-    
-    return new Promise((resolve, reject) => {
-        reader.onloadend = () => {
-            // Remove the "data:image/jpeg;base64," part from the result
-            const base64String = reader.result.split(',')[1];  // Get only the Base64 data part
-            resolve(base64String);  // Resolve with the pure Base64 string
-        };
-        reader.onerror = reject;  // Reject on error
-        reader.readAsDataURL(blob);  // Start reading the image as a Base64 string
-    });
-}
-
-
-
-        analyzeButton.addEventListener('click', analyzeFlower);
+analyzeButton.addEventListener('click', analyzeFlower);
 
         window.addEventListener('load', () => {
             startCamera();
