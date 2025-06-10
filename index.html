@@ -243,16 +243,16 @@
         }
 
         captureButton.addEventListener('click', () => {
+            buttonOnHold(captureButton);
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
             photo.src = canvas.toDataURL('image/jpeg');         
-            buttonOnHold(captureButton);
         });
 
         deleteButton.addEventListener('click', () => {
-            photo.src = '';
             buttonOnHold(deleteButton);
+            photo.src = '';
         });
 
         document.getElementById('GalleryContentId').addEventListener('click', () => {
@@ -260,6 +260,7 @@
         });
 
         saveButton.addEventListener('click', () => {
+            buttonOnHold(captureButton);
             const imageDataUrl = canvas.toDataURL('image/jpeg');
             const link = document.createElement('a');
             link.href = imageDataUrl;
@@ -279,7 +280,6 @@
             request.onerror = event => {
                 console.error("IndexedDB save error:", event.target.errorCode);
             };
-            buttonOnHold(captureButton);
         });
 
         function loadPhotos() {
@@ -319,6 +319,7 @@
                     div.appendChild(deleteButton);
 
                     deleteButton.addEventListener('click', () => {
+                        buttonOnHold(captureButton);
                         if (confirm("Are you sure you want to delete this photo?")) {
 
                             // Delete from database
@@ -328,7 +329,6 @@
                             console.log("Photo deletion canceled.");
                         }
 
-                        buttonOnHold(captureButton);
                     });
 
                     container.appendChild(div);
@@ -399,8 +399,8 @@
         }
 
         analyzeButton.addEventListener('click', function() {
-            analyzeFlower();
             buttonOnHold(analyzeButton);
+            analyzeFlower();
         });
 
         window.addEventListener('load', () => {
