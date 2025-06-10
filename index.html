@@ -1,414 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Watering App</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: #a1c9a1;
-            font-size: 16px;
-            color: #333;
-        }
-
-        header {
-            background-image: url('header.avif');
-            background-size: cover;
-            background-position: center;
-            height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        header h1 {
-            color: white;
-            font-size: 1.8rem;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-        }
-
-        .tabbar {
-            display: flex;
-            justify-content: space-around;
-            background-color: #4caf50;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .tablink {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            color: white;
-            background-color: #4caf50;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .tablink:hover {
-            background-color: #66bb6a;
-        }
-
-        .tabcontent {
-            display: none;
-            padding: 20px;
-        }
-
-        .tabcontent h1 {
-            color: #2e7d32;
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
-        p {
-            font-size: 1rem;
-            margin-bottom: 15px;
-        }
-
-        video,
-        img {
-            width: 100%;
-            max-width: 320px;
-            margin: 10px auto;
-            display: block;
-            border-radius: 12px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            width: 100%;
-            max-width: 320px;
-            margin: 10px auto;
-            display: block;
-            padding: 12px;
-            font-size: 16px;
-            background-color: #81c784;
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #66bb6a;
-        }
-
-        #errorMessageId,
-        #warningMessageId {
-            padding: 10px;
-            margin: 10px 0;
-            display: none;
-            text-align: center;
-        }
-
-        #errorMessageId {
-            background-color: #e53935;
-            color: white;
-        }
-
-        #warningMessageId {
-            background-color: #fbc02d;
-            color: black;
-        }
-
-        a {
-            color: #2e7d32;
-            text-decoration: underline;
-        }
-
-        #photosContainer img {
-            width: 100px;
-            margin: 5px;
-            border-radius: 8px;
-        }
-    </style>
 </head>
-
 <body>
-    <header>
-        <h1>Plant Watering App</h1>
-    </header>
 
-    <nav class="tabbar">
-        <button id="HomeContentId" class="tablink" data-tab="HomeContent">Home</button>
-        <button id="CameraContentId" class="tablink" data-tab="CameraContent">Camera</button>
-        <button id="GalleryContentId" class="tablink" data-tab="GalleryContent">Gallery</button>
-        <button id="DetailsContentId" class="tablink" data-tab="DetailsContent">Details</button>
-    </nav>
+    <!-- Image to send -->
+    <img id="photo" src="rose.png" alt="Captured Photo" style="display:none;">
 
-    <div id="HomeContent" class="tabcontent">
-        <h1>Welcome to the Plant Watering App</h1>
-        <p>This app helps support plant care and reduce water waste.</p>
-        <p>Developed in Summer 2025 as part of a two-week mobile app workshop.</p>
-        <br>
-        <p>Want to contribute? Visit our open-source project on GitHub:</p>
-        <p><a href="https://github.com/SE4CPS/PlantWateringCellPhoneApp/" target="_blank">GitHub Repository</a>
-        </p>
-    </div>
-
-    <div id="CameraContent" class="tabcontent">
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <img id="photo" alt="Captured Photo">
-        <button id="captureButton">Take Photo</button>
-        <button id="saveButton">Save Photo</button>
-        <button id="deleteButton">Delete Photo</button>
-    </div>
-
-    <div id="GalleryContent" class="tabcontent">
-        <section id="errorMessageId"></section>
-        <section id="warningMessageId"></section>
-        <div id="photosContainer"></div>
-        <button id="analyzeButton">Analyze Photo</button>
-    </div>
-
-    <div id="DetailsContent" class="tabcontent">
-
-    </div>
+    <button id="analyzeButton">Analyze Flower</button>
 
     <script>
-        function openTab(tabId, element) {
-            document.querySelectorAll('.tabcontent').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tablink').forEach(t => t.style.backgroundColor = '#4caf50');
-            document.getElementById(tabId).style.display = 'block';
-            element.style.backgroundColor = '#66bb6a';
-        }
+        // Function to handle the request and use CORS proxy
+        async function analyzeFlower() {
+            const apiUrl = 'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10lKE5W6Q5K5ajPWxctu7qe';
+            const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/'; // Temporary CORS proxy
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.tablink').forEach(button => {
-                button.addEventListener('click', () => {
-                    openTab(button.getAttribute('data-tab'), button);
-                });
+            const image = document.getElementById('photo'); // Static image from the same folder
+            const imageUrl = image.src; // Image URL
+
+            // Fetch image as Blob
+            const response = await fetch(imageUrl);
+            const imageBlob = await response.blob();
+
+            // Prepare the FormData for sending as multipart/form-data
+            const formData = new FormData();
+            formData.append('images', imageBlob, 'rose.png'); // Add image blob to formData
+
+            // Sending the fetch request using the CORS proxy
+            const fetchResponse = await fetch(corsProxyUrl + apiUrl, {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                },
+                body: formData
             });
-            document.querySelector('.tablink').click(); // Open default tab
-        });
 
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const photo = document.getElementById('photo');
-        const captureButton = document.getElementById('captureButton');
-        const saveButton = document.getElementById('saveButton');
-        const deleteButton = document.getElementById('deleteButton');
-        const analyzeButton = document.getElementById('analyzeButton');
-        const now = new Date().toLocaleString();
-
-        const db = indexedDB.open("PlantPhotos", 1);
-        db.onupgradeneeded = function (event) {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("photos")) {
-                db.createObjectStore("photos", { keyPath: "id", autoIncrement: true });
+            // Handle the response
+            if (!fetchResponse.ok) {
+                const errorText = await fetchResponse.text();
+                throw new Error(`API error: ${fetchResponse.status} - ${errorText}`);
             }
-        };
-        db.onsuccess = function () {
-            console.log("Database opened successfully");
-        };
-        db.onerror = function (event) {
-            console.error("Database error:", event.target.errorCode);
-        };
 
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                video.srcObject = stream;
-            } catch (err) {
-                const errorMessage = document.getElementById('errorMessageId');
-                errorMessage.style.display = 'block';
-                errorMessage.innerHTML = `<p>Error accessing the camera: ${err.message}</p>`;
-                setTimeout(() => errorMessage.style.display = 'none', 5000);
-            }
+            const result = await fetchResponse.json();
+            console.log(result); // You can process the result further here
+            alert('Flower analyzed! Check console for result.');
         }
 
-        captureButton.addEventListener('click', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            photo.src = canvas.toDataURL('image/jpeg');
-        });
-
-        deleteButton.addEventListener('click', () => {
-            photo.src = '';
-        });
-
-
-        document.getElementById('GalleryContentId').addEventListener('click', () => {
-            loadPhotos();
-        });
-
-        saveButton.addEventListener('click', () => {
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
-            const link = document.createElement('a');
-            link.href = imageDataUrl;
-            link.download = now + '.jpg';
-            document.body.appendChild(link);
-            link.click();
-
-            const transaction = db.result.transaction("photos", "readwrite");
-            const store = transaction.objectStore("photos");
-            const data = { timestamp: now, image: imageDataUrl };
-
-            const request = store.add(data);
-            request.onsuccess = () => {
-                console.log("Saved to IndexedDB", data);
-                loadPhotos();
-            };
-            request.onerror = event => {
-                console.error("IndexedDB save error:", event.target.errorCode);
-            };
-        });
-
-        function loadPhotos() {
-            const transaction = db.result.transaction("photos", "readonly");
-            const store = transaction.objectStore("photos");
-            const request = store.getAll();
-            const container = document.getElementById('photosContainer');
-
-            request.onsuccess = event => {
-                const photos = event.target.result;
-                container.innerHTML = '';
-                photos.forEach(photoData => {
-
-                    const photoId = photoData.id;
-
-                    const img = document.createElement('img');
-                    const div = document.createElement('div');
-
-                    div.style.display = 'flex';
-                    div.style.gap = '5px';
-                    div.style.marginBottom = '5px';
-                    div.style.borderBottom = '1px solid gray';
-
-                    const deleteButton = document.createElement('button');
-                    const detailsButton = document.createElement('button');
-
-                    deleteButton.style.backgroundColor = '#e56c6c';
-
-                    deleteButton.innerHTML = 'Delete &#9940;';
-                    detailsButton.innerHTML = 'Details &#128269;';
-
-                    img.src = photoData.image;
-                    img.alt = photoData.timestamp;
-
-                    div.appendChild(img);
-                    div.appendChild(detailsButton);
-                    div.appendChild(deleteButton);
-
-                    deleteButton.addEventListener('click', () => {
-                        if (confirm("Are you sure you want to delete this photo?")) {
-
-                            // Delete from database
-                            deleteItem(photoId);
-
-                        } else {
-                            console.log("Photo deletion canceled.");
-                        }
-                    });
-
-                    container.appendChild(div);
-                });
-            };
-            request.onerror = event => {
-                console.error("Load error:", event.target.errorCode);
-            };
-        }
-
-        function deleteItem(id) {
-            let request = indexedDB.open("PlantPhotos", 1);
-
-            request.onsuccess = function (event) {
-                let db = event.target.result;
-
-                let transaction = db.transaction(["photos"], "readwrite");
-                let objectStore = transaction.objectStore("photos");
-                let deleteRequest = objectStore.delete(id);
-
-                deleteRequest.onsuccess = function () {
-                    console.log("Deleted", id);
-                };
-
-                transaction.oncomplete = function () {
-                    loadPhotos();
-                };
-
-                transaction.onerror = function (event) {
-                    console.error("Transaction error:", event.target.error);
-                };
-            };
-
-            request.onerror = function (event) {
-                console.error("Database open error:", event.target.error);
-            };
-        }
-
-
-        function checkBatteryStatus() {
-            navigator.getBattery().then(battery => {
-                const warningMessage = document.getElementById('warningMessageId');
-                if (battery.level < 0.1) {
-                    warningMessage.style.display = 'block';
-                    warningMessage.innerHTML = `<p>Low Battery: Please charge your device</p>`;
-                } else {
-                    warningMessage.style.display = 'none';
-                }
-            }).catch(err => {
-                console.error("Battery check failed:", err);
-            });
-        }
-
-        async function getData() {
-            const url = "https://perenual.com/api/v2/species-list?key=sk-O4Vg68431f0dc1a5010877";
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`API Error: ${response.status}`);
-                const data = await response.json();
-                console.log(data);
-            } catch (error) {
-                console.error("getData error:", error.message);
-            }
-        }
-
-async function analyzeFlower() {
-    const apiUrl = 'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10lKE5W6Q5K5ajPWxctu7qe';
-    const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/'; // Temporary CORS proxy
-
-    const image = document.getElementById('photo').src; // Assuming this is where the captured image is
-
-    const response = await fetch(corsProxyUrl + apiUrl, {
-        method: 'POST',
-        headers: {
-            'accept': 'application/json',
-            'Content-Type': 'multipart/form-data',
-        },
-        body: new FormData().append('images', image, 'flower.png'), // Add image data here
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API error: ${response.status} - ${errorText}`);
-    }
-
-    const result = await response.json();
-    console.log(result); // Process the result
-}
-
-
-analyzeButton.addEventListener('click', analyzeFlower);
-
-        window.addEventListener('load', () => {
-            startCamera();
-            checkBatteryStatus();
-            getData();
-        });
+        // Add event listener to analyze button
+        document.getElementById('analyzeButton').addEventListener('click', analyzeFlower);
     </script>
 </body>
-
 </html>
