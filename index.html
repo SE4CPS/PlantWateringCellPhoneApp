@@ -377,49 +377,29 @@
         }
 
 async function analyzeFlower() {
-    const apiUrl = 'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10lKE5W6Q5K5ajPWxctu7qe'; // New API URL
+    const apiUrl = 'https://my-api.plantnet.org/v2/identify/all?include-related-images=false&no-reject=false&nb-results=10&lang=en&api-key=2b10lKE5W6Q5K5ajPWxctu7qe';
+    const corsProxyUrl = 'https://cors-anywhere.herokuapp.com/'; // Temporary CORS proxy
 
-    // Reading the rose.png file directly from the same directory
-    const imageUrl = 'rose.png'; // Path to the image (in the same directory as the HTML file)
+    const image = document.getElementById('photo').src; // Assuming this is where the captured image is
 
-    try {
-        // Fetch the image file as a Blob
-        const imageBlob = await fetch(imageUrl).then(res => res.blob());
+    const response = await fetch(corsProxyUrl + apiUrl, {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+        },
+        body: new FormData().append('images', image, 'flower.png'), // Add image data here
+    });
 
-        const formData = new FormData();
-        formData.append('images', imageBlob, 'rose.png');  // Appending the image as multipart/form-data
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json', // Accepting JSON response
-            },
-            body: formData, // Sending the FormData with image
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API error: ${response.status} - ${errorText}`);
-        }
-
-        const result = await response.json();
-        console.log("PlantNet result:", result);
-
-        if (result.status === 'OK' && result.results.length > 0) {
-            const bestMatch = result.results[0];
-            const plantName = bestMatch.scientificName || 'Unknown Plant';
-            const confidence = bestMatch.probability || 'N/A';
-
-            alert(`Flower identified as: ${plantName}\nConfidence: ${confidence}`);
-        } else {
-            alert('No plant identified.');
-        }
-
-    } catch (err) {
-        console.error("Analyze error:", err.message);
-        alert('An error occurred during the analysis. Please try again.');
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API error: ${response.status} - ${errorText}`);
     }
+
+    const result = await response.json();
+    console.log(result); // Process the result
 }
+
 
 analyzeButton.addEventListener('click', analyzeFlower);
 
