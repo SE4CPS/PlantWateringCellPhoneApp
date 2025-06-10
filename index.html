@@ -260,7 +260,7 @@
         });
 
         saveButton.addEventListener('click', () => {
-            buttonOnHold(captureButton);
+            buttonOnHold(saveButton);
             const imageDataUrl = canvas.toDataURL('image/jpeg');
             const link = document.createElement('a');
             link.href = imageDataUrl;
