@@ -197,6 +197,7 @@
     </div>
 
     <script>
+      
         function openTab(tabId, element) {
             document.querySelectorAll('.tabcontent').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.tablink').forEach(t => t.style.backgroundColor = '#4caf50');
@@ -212,6 +213,10 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
+
+            var audio = new Audio('music.mp3');
+            audio.play();
+            
             document.querySelectorAll('.tablink').forEach(button => {
                 button.addEventListener('click', () => {
                     openTab(button.getAttribute('data-tab'), button);
