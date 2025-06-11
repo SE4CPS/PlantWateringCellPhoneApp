@@ -212,11 +212,7 @@
             },4000);             
         }
         
-        document.addEventListener('DOMContentLoaded', () => {
-
-            var audio = new Audio('music.mp3');
-            audio.play();
-            
+        document.addEventListener('DOMContentLoaded', () => {          
             document.querySelectorAll('.tablink').forEach(button => {
                 button.addEventListener('click', () => {
                     openTab(button.getAttribute('data-tab'), button);
@@ -275,6 +271,8 @@
 
         document.getElementById('GalleryContentId').addEventListener('click', () => {
             loadPhotos();
+            let audio = new Audio('music.mp3');
+            audio.play();
         });
 
         saveButton.addEventListener('click', () => {
