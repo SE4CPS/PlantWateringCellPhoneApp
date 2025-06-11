@@ -118,8 +118,11 @@
 
         #errorMessageId,
         #warningMessageId {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
             padding: 10px;
-            margin: 10px 0;
             display: none;
             text-align: center;
         }
@@ -157,6 +160,10 @@
 </head>
 
 <body>
+
+    <section id="errorMessageId"></section>
+    <section id="warningMessageId"></section>
+    
     <header>
         <h1>Plant Watering App</h1>
     </header>
@@ -188,8 +195,6 @@
     </div>
 
     <div id="GalleryContent" class="tabcontent">
-        <section id="errorMessageId"></section>
-        <section id="warningMessageId"></section>
         <div id="photosContainer"></div>
         <button id="analyzeButton">Analyze Photo</button>
     </div>
