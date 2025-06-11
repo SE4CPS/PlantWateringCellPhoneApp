@@ -204,6 +204,7 @@
     
     <header>
         <h1>Plant Watering App</h1>
+        <img id="imgDetails">
     </header>
 
     <nav class="tabbar">
@@ -379,6 +380,10 @@
 
                     deleteButton.innerHTML = 'Delete &#9940;';
                     detailsButton.innerHTML = 'Details &#128269;';
+
+                    detailsButton.addEventListener('click', function() {
+                        console.log("TBD: Show image at the topic after...");
+                    });
 
                     img.src = photoData.image;
                     img.alt = photoData.timestamp;
