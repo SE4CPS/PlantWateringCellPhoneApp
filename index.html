@@ -476,6 +476,8 @@
                     detailsButton.addEventListener('click', function() {
                         console.log("TBD: Scale image on button click...");
                         modal.style.display = "block";
+                        var img = document.getElementById("photoId"+photoId);
+                        var modalImg = document.getElementById("img01");
                         modalImg.src = img.src;
                         captionText.innerHTML = this.alt;
                         // img.style.transform = 'scale(3,3)';                 
