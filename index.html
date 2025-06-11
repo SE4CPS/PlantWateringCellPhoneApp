@@ -331,10 +331,10 @@
             buttonOnHold(saveButton);
             const imageDataUrl = canvas.toDataURL('image/jpeg');
             const link = document.createElement('a');
-            link.href = imageDataUrl;
-            link.download = now + '.jpg';
+            // link.href = imageDataUrl;
+            // link.download = now + '.jpg';
             document.body.appendChild(link);
-            link.click();
+            // link.click();
 
             const transaction = db.result.transaction("photos", "readwrite");
             const store = transaction.objectStore("photos");
