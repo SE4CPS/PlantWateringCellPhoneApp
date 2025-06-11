@@ -317,8 +317,9 @@
         });
 
         deleteButton.addEventListener('click', () => {
-            buttonOnHold(deleteButton);
             photo.src = '';
+            photo.style.display = "none"; // Hide the image
+            buttonOnHold(deleteButton);
         });
 
         document.getElementById('GalleryContentId').addEventListener('click', () => {
