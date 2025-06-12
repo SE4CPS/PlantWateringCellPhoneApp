@@ -1181,12 +1181,23 @@
 
                     const deleteButton = document.createElement('button');
                     const detailsButton = document.createElement('button');
+                    const shareButton = document.createElement('button');
 
                     deleteButton.style.backgroundColor = '#e56c6c';
 
                     deleteButton.innerHTML = 'Delete &#9940;';
                     detailsButton.innerHTML = 'Details &#128269;';
+                    shareButton.innerHTML = 'Share';
 
+                    shareButton.addEventListener('click', function() {
+                        let shareData = {
+                            title: 'Check out the flower',
+                            text: 'Plant Watering Cell Phone App',
+                            url: 'https://se4cps.github.io/PlantWateringCellPhoneApp/',
+                        };
+                        navigator.share(shareData);                       
+                    });
+                    
                     detailsButton.addEventListener('click', function() {
                         console.log("TBD: Scale image on button click...");
                         modal.style.display = "block";
